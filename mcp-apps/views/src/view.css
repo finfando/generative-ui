@@ -1,0 +1,73 @@
+/* Fallbacks for the host style variables. The host overrides these via
+   hostContext.styles.variables, so views match whatever chat client they run in. */
+:root {
+  color-scheme: light dark;
+  --color-text-primary: light-dark(#1f2937, #f3f4f6);
+  --color-text-secondary: light-dark(#6b7280, #9ca3af);
+  --color-text-danger: light-dark(#b91c1c, #f87171);
+  --color-text-success: light-dark(#15803d, #4ade80);
+  --color-background-primary: light-dark(#ffffff, #1a1a1a);
+  --color-background-secondary: light-dark(#f5f5f5, #2d2d2d);
+  --color-border-primary: light-dark(#e5e7eb, #404040);
+  --color-ring-primary: light-dark(#3b82f6, #60a5fa);
+  --font-sans: ui-sans-serif, system-ui, sans-serif;
+  --border-radius-md: 8px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  background: transparent;
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-size: 14px;
+}
+
+.view { padding: 14px 16px; }
+.muted { color: var(--color-text-secondary); }
+.error { color: var(--color-text-danger); }
+
+h2 { margin: 0 0 8px; font-size: 16px; }
+
+button {
+  font: inherit;
+  padding: 6px 12px;
+  border-radius: var(--border-radius-md);
+  border: 1px solid var(--color-border-primary);
+  background: var(--color-background-secondary);
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+button:hover:not(:disabled) { border-color: var(--color-ring-primary); }
+button:disabled { opacity: 0.5; cursor: default; }
+button.primary { background: var(--color-ring-primary); border-color: var(--color-ring-primary); color: white; }
+
+input, select {
+  font: inherit;
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: var(--border-radius-md);
+  border: 1px solid var(--color-border-primary);
+  background: var(--color-background-primary);
+  color: var(--color-text-primary);
+}
+
+.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.note { font-size: 12px; color: var(--color-text-secondary); margin-top: 8px; }
+
+/* Building blocks for the declarative renderer (ui.tsx) */
+:root { --color-text-warning: light-dark(#a16207, #fbbf24); }
+.g-card { border: 1px solid var(--color-border-primary); border-radius: var(--border-radius-md); padding: 12px; background: var(--color-background-primary); }
+.g-card-title { font-weight: 650; margin-bottom: 8px; }
+.g-row > * { flex: 1 1 140px; min-width: 0; }
+.g-stat { padding: 10px 12px; border-radius: var(--border-radius-md); background: var(--color-background-secondary); }
+.g-badge { display: inline-block; font-size: 12px; padding: 2px 8px; border-radius: 999px; border: 1px solid currentColor; width: fit-content; }
+.g-track { height: 8px; border-radius: 999px; background: var(--color-background-secondary); overflow: hidden; }
+.g-fill { height: 100%; background: var(--color-ring-primary); transition: width 0.3s; }
+.g-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.g-table th, .g-table td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--color-border-primary); }
+.g-table th { font-weight: 600; color: var(--color-text-secondary); }
+.g-list { margin: 0; padding-left: 20px; line-height: 1.5; }
+.g-hr { border: 0; border-top: 1px solid var(--color-border-primary); margin: 2px 0; width: 100%; }

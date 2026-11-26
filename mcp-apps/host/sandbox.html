@@ -1,0 +1,60 @@
+<!doctype html>
+<!--
+  Sandbox proxy (outer iframe), served from a different origin than the host.
+
+    host page (:5180)  <-postMessage->  THIS page (:5181)  <-postMessage->  inner iframe (the view)
+
+  1. On load it tells the host "ui/notifications/sandbox-proxy-ready".
+  2. The host replies with "ui/notifications/sandbox-resource-ready" carrying
+     the view's HTML. We write it into the inner iframe.
+  3. Everything else is relayed unchanged in both directions. The host's
+     AppBridge and the view's App think they talk directly to each other.
+-->
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="color-scheme" content="light dark" />
+    <style>
+      html, body { margin: 0; height: 100%; background: transparent; }
+      iframe { border: 0; width: 100%; height: 100%; display: block; background: transparent; color-scheme: inherit; }
+    </style>
+  </head>
+  <body>
+    <script>
+      if (window.self === window.top) throw new Error("sandbox.html must run inside an iframe");
+      const HOST_ORIGIN = new URL(document.referrer).origin;
+      if (!/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(HOST_ORIGIN)) {
+        throw new Error("Unexpected embedding origin: " + HOST_ORIGIN);
+      }
+
+      const inner = document.createElement("iframe");
+      // allow-same-origin keeps the inner frame on THIS (sandbox) origin, which
+      // is already isolated from the host. No allow-top-navigation, no popups.
+      inner.setAttribute("sandbox", "allow-scripts allow-same-origin allow-forms");
+      document.body.appendChild(inner);
+
+      window.addEventListener("message", (event) => {
+        if (event.source === window.parent) {
+          if (event.origin !== HOST_ORIGIN) return;
+          if (event.data?.method === "ui/notifications/sandbox-resource-ready") {
+            const { html, sandbox } = event.data.params;
+            if (typeof sandbox === "string") inner.setAttribute("sandbox", sandbox);
+            const doc = inner.contentDocument;
+            doc.open();
+            doc.write(html);
+            doc.close();
+            return;
+          }
+          inner.contentWindow?.postMessage(event.data, "*");
+        } else if (event.source === inner.contentWindow) {
+          window.parent.postMessage(event.data, HOST_ORIGIN);
+        }
+      });
+
+      window.parent.postMessage(
+        { jsonrpc: "2.0", method: "ui/notifications/sandbox-proxy-ready", params: {} },
+        HOST_ORIGIN,
+      );
+    </script>
+  </body>
+</html>
